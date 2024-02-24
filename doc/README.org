@@ -1,3 +1,4 @@
+#+title:chess.cpp
 #+author: enkg
 #+EXPORT_FIle_NAME: ../README.org
 #+toc: true
