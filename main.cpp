@@ -3,7 +3,7 @@ using namespace std;
 
 char board[8][8];
 
-void start_game(){
+void reset_board(){
 
   char pawns[8] = {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'};
   char others[8] = {'t', 'h', 'b', 'q', 'k', 'b', 'h', 't'};
@@ -48,6 +48,9 @@ void print_board(){
 }
 
 int main(){
-  start_game();
-  print_board();
+  reset_board();
+  while(true){
+    string input;
+    cin >> input;
+  }
 }
