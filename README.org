@@ -1,0 +1,12 @@
+# Created 2024-02-24 Sat 00:01
+#+title: 
+#+author: enkg
+#+export_file_name: ../README.org
+#+toc: true
+* chess.cpp
+2 Player Chess written in C++ with (optional) nerd font functionality.
+* Table Of Contents
+:CONTENTS:
+- [[#chesscpp][chess.cpp]]
+- [[#table-of-contents][Table Of Contents]]
+:END:

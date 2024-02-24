@@ -1,0 +1,24 @@
+#+author: enkg
+#+EXPORT_FIle_NAME: ../README.org
+#+toc: true
+
+* chess.cpp
+:PROPERTIES:
+:CUSTOM_ID: chesscpp
+:END:
+2 Player Chess written in C++ with (optional) nerd font functionality.
+
+* Table Of Contents
+:PROPERTIES:
+:TOC:      :include all
+:CUSTOM_ID: table-of-contents
+:END:
+:CONTENTS:
+- [[#chesscpp][chess.cpp]]
+- [[#table-of-contents][Table Of Contents]]
+:END:
+
+# Local Variables:
+# org-make-toc-insert-custom-ids: true
+# before-save-hook: org-make-toc
+# End:
