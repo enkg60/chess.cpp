@@ -3,7 +3,6 @@
 #+EXPORT_FIle_NAME: ../README.org
 #+toc: true
 
-* chess.cpp
 :PROPERTIES:
 :CUSTOM_ID: chesscpp
 :END:
@@ -15,7 +14,6 @@
 :CUSTOM_ID: table-of-contents
 :END:
 :CONTENTS:
-- [[#chesscpp][chess.cpp]]
 - [[#table-of-contents][Table Of Contents]]
 :END:
 
