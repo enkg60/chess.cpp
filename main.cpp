@@ -49,24 +49,43 @@ bool check_spot_for_piece(int location[2]) {
   }
 }
 
-bool check_move(bool white, int location[2], int target[2]) {
+int check_moves(bool white, int location[2], int target[2]) {
   int size = 0;
-
-  bool pawn, bishop, knight, rook, queen, king;
-  pawn = bishop = knight = rook = queen = king = true;
-
-  if (pawn) {
+  char type = board[location[0]][location[1]];
+  if (type == 'p') {
+    int *possibleMoves = new int[size];
+    if (white) {
+      if (board[location[0] + 1][location[1]] == '+') {
+        // ADD ONE TO POSSIBE MOVES
+      }
+      if (location[1] != 0 || 7) { // if not edges of the board on x axis
+        // check for attacking moves
+        if (board[location[0] + 1][location[1] + 1] != '+') {
+          // ADD ONE TO POSSIBLE MOVES
+        } else if (board[location[0]++][location[1] - 1] != '+') {
+          // ADD ONE TO POSSIBLE MOVES
+        }
+      }
+    } else {
+      int forward[2] = {board[location[0]--][location[1]]};
+    }
+    /*
+    int *copying = new int[length];
+        copying[0] = 1;
+        delete[] time;
+        copy(copying, copying + length, time);
+        delete[] copying;
+        */
   }
-
-  if (bishop) {
+  if (type == 'b') {
   }
-  if (knight) {
+  if (type == 'n') {
   }
-  if (rook) {
+  if (type == 'r') {
   }
-  if (king) {
+  if (type == 'k') {
   }
-  if (queen) {
+  if (type == 'q') {
   }
 
   // check if possibleMoves line up with target
