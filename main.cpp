@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stack>
+
 using namespace std;
 
 char board[8][8];
@@ -41,7 +43,7 @@ void display_board() {
   cout << "  a b c d e f g h\n";
 }
 
-bool check_spot_for_piece(int location[2]) {
+bool check_for_piece(int location[2]) {
   if (board[location[0]][location[1]] != '+') {
     return true;
   } else {
@@ -49,33 +51,62 @@ bool check_spot_for_piece(int location[2]) {
   }
 }
 
-int check_moves(bool white, int location[2], int target[2]) {
-  int size = 0;
-  char type = board[location[0]][location[1]];
+stack<int[2]> check_moves(bool white, int position[2], int target[2]) {
+  int y = position[0];
+  int x = position[1];
+  char type = board[y][x];
+
+  stack<int[2]> possibleMoves;
   if (type == 'p') {
-    int *possibleMoves = new int[size];
     if (white) {
-      if (board[location[0] + 1][location[1]] == '+') {
-        // ADD ONE TO POSSIBE MOVES
+      int diagonalRight[2] = {y + 1, x + 1};
+      int diagonalLeft[2] = {y + 1, x - 1};
+      int forward[2] = {y + 1, x};
+
+      if (check_for_piece(forward)) {
+        possibleMoves.push(forward);
       }
-      if (location[1] != 0 || 7) { // if not edges of the board on x axis
-        // check for attacking moves
-        if (board[location[0] + 1][location[1] + 1] != '+') {
-          // ADD ONE TO POSSIBLE MOVES
-        } else if (board[location[0]++][location[1] - 1] != '+') {
-          // ADD ONE TO POSSIBLE MOVES
+      if (x == 0) {
+        if (check_for_piece(diagonalRight)) {
+          possibleMoves.push(diagonalRight);
+        }
+      } else if (x == 7) {
+        if (check_for_piece(diagonalLeft)) {
+          possibleMoves.push(diagonalLeft);
+        }
+      } else {
+        if (check_for_piece(diagonalRight)) {
+          possibleMoves.push(diagonalRight);
+        }
+        if (check_for_piece(diagonalLeft)) {
+          possibleMoves.push(diagonalLeft);
         }
       }
     } else {
-      int forward[2] = {board[location[0]--][location[1]]};
+      int diagonalRight[2] = {y - 1, x - 1};
+      int diagonalLeft[2] = {y - 1, x + 1};
+      int forward[2] = {y - 1, x};
+
+      if (check_for_piece(forward)) {
+        possibleMoves.push(forward);
+      }
+      if (x == 0) {
+        if (check_for_piece(diagonalRight)) {
+          possibleMoves.push(diagonalRight);
+        }
+      } else if (x == 7) {
+        if (check_for_piece(diagonalLeft)) {
+          possibleMoves.push(diagonalLeft);
+        }
+      } else {
+        if (check_for_piece(diagonalRight)) {
+          possibleMoves.push(diagonalRight);
+        }
+        if (check_for_piece(diagonalLeft)) {
+          possibleMoves.push(diagonalLeft);
+        }
+      }
     }
-    /*
-    int *copying = new int[length];
-        copying[0] = 1;
-        delete[] time;
-        copy(copying, copying + length, time);
-        delete[] copying;
-        */
   }
   if (type == 'b') {
   }
@@ -87,17 +118,7 @@ int check_moves(bool white, int location[2], int target[2]) {
   }
   if (type == 'q') {
   }
-
-  // check if possibleMoves line up with target
-  /*
-  for (int i = 0; i < size; i++) {
-    if (possibleMoves[i] == target) {
-
-      return true;
-    }
-  }
-  */
-  return false;
+  return possibleMoves;
 }
 
 int main() {
