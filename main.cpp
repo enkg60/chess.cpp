@@ -31,23 +31,25 @@ void reset_board(){
 }
 
 void display_board(){
-  cout << "  a b c d e f g h\n";
   for(int y = 0; y < 8; y++){
     for(int x = 0; x < 8; x++){
       if(x == 0){
-        cout << y+1 << ' ';
+        cout << 8-(y) << ' ';
       }
       cout << board[y][x] << ' ';
     }
     cout << "\n";
   }
+  cout << "  a b c d e f g h\n";
 }
 
-bool check_moves(char piece){
+/*bool check_move(bool white, int piece[2], int location[2]){
   bool pawn, bishop, knight, rook, queen, king;
   pawn = bishop = knight = rook = queen = king = true;
-  if(pawn){
 
+
+  if(pawn){
+    int possibleMove[2] = {piece[0]+, piece[1]}
   }
   if(bishop){
 
@@ -65,15 +67,20 @@ bool check_moves(char piece){
 
   }
   return false;
-}
+}*/
 
 int main(){
   reset_board();
+  display_board();
+  /*
   while(true){
-    string input;
-    cin >> input;
-    
+    cout << "piece to move (line 1) and where (line 2)"
+    string piece;
+    cin >> piece;
+    //string location;
+    //cin >> location;
   }
+  */
 }
 
   /*
