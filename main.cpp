@@ -51,7 +51,7 @@ bool check_for_piece(int location[2]) {
   }
 }
 
-stack<int[2]> check_moves(bool white, int position[2], int target[2]) {
+stack<int[2]> check_moves(bool white, array<int, 2> position) {
   int y = position[0];
   int x = position[1];
   char type = board[y][x];
@@ -124,15 +124,20 @@ stack<int[2]> check_moves(bool white, int position[2], int target[2]) {
 int main() {
   reset_board();
   display_board();
-  /*
-  while(true){
-    cout << "piece to move (line 1) and where (line 2)"
-    string piece;
-    cin >> piece;
-    //string location;
-    //cin >> location;
+  stack<int[2]> y = check_moves(true, {6, 2});
+  while (!y.empty()) {
+    board[y.top()[0]][y.top()[1]] = 'x';
   }
-  */
+}
+/*
+while(true){
+  cout << "piece to move (line 1) and where (line 2)"
+  string piece;
+  cin >> piece;
+  //string location;
+  //cin >> location;
+}
+*/
 }
 
 /*
