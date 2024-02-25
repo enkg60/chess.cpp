@@ -43,14 +43,25 @@ void display_board(){
   cout << "  a b c d e f g h\n";
 }
 
-/*bool check_move(bool white, int piece[2], int location[2]){
+bool check_spot_for_piece(int location[2]){
+  if(board[location[0]][location[1]] != '+'){
+    return true;
+  }else{
+    return false;
+  }
+}
+
+bool check_move(bool white, int location[2], int target[2]){
+  int size = 0;
+
   bool pawn, bishop, knight, rook, queen, king;
   pawn = bishop = knight = rook = queen = king = true;
 
 
   if(pawn){
-    int possibleMove[2] = {piece[0]+, piece[1]}
   }
+
+
   if(bishop){
 
   }
@@ -66,8 +77,17 @@ void display_board(){
   if(queen){
 
   }
+
+  //check if possibleMoves line up with target
+  for(int i = 0; i < size; i++){
+    if(possibleMoves[i] == target){
+      
+      return true;
+    }
+
+  }
   return false;
-}*/
+}
 
 int main(){
   reset_board();
