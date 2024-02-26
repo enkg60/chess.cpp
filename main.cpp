@@ -1,3 +1,4 @@
+#include <array>
 #include <iostream>
 #include <stack>
 
@@ -43,7 +44,7 @@ void display_board() {
   cout << "  a b c d e f g h\n";
 }
 
-bool check_for_piece(int location[2]) {
+bool check_for_piece(array<int, 2> location) {
   if (board[location[0]][location[1]] != '+') {
     return true;
   } else {
@@ -51,60 +52,51 @@ bool check_for_piece(int location[2]) {
   }
 }
 
-stack<int[2]> check_moves(bool white, array<int, 2> position) {
+stack<array<int, 2> /* */> check_moves(bool white, array<int, 2> position) {
   int y = position[0];
   int x = position[1];
   char type = board[y][x];
 
-  stack<int[2]> possibleMoves;
+  stack<array<int, 2> /* */> possibleMoves;
   if (type == 'p') {
+    /*diagonalRight = {y + (1*flip), x + (1*flip)};
+    diagonalLeft = {y + (1*flip), x - (1*flip)};
+    forward = {y + (1*flip), x};
+    int flip = 1;*/
+    array<int, 2> diagonalRight, diagonalLeft, forward;
     if (white) {
-      int diagonalRight[2] = {y + 1, x + 1};
-      int diagonalLeft[2] = {y + 1, x - 1};
-      int forward[2] = {y + 1, x};
+      diagonalRight[0] = y - 1;
+      diagonalRight[1] = x + 1;
+      diagonalLeft[0] = y - 1;
+      diagonalLeft[1] = x - 1;
+      forward[0] = y - 1;
+      forward[1] = x;
+    } else {
+      diagonalRight[0] = y + 1;
+      diagonalRight[1] = x - 1;
+      diagonalLeft[0] = y + 1;
+      diagonalLeft[1] = x + 1;
+      forward[0] = y + 1;
+      forward[1] = x;
+    }
 
-      if (check_for_piece(forward)) {
-        possibleMoves.push(forward);
+    if (!check_for_piece(forward)) {
+      possibleMoves.push(forward);
+    }
+    if (x == 0) {
+      if (check_for_piece(diagonalRight)) {
+        possibleMoves.push(diagonalRight);
       }
-      if (x == 0) {
-        if (check_for_piece(diagonalRight)) {
-          possibleMoves.push(diagonalRight);
-        }
-      } else if (x == 7) {
-        if (check_for_piece(diagonalLeft)) {
-          possibleMoves.push(diagonalLeft);
-        }
-      } else {
-        if (check_for_piece(diagonalRight)) {
-          possibleMoves.push(diagonalRight);
-        }
-        if (check_for_piece(diagonalLeft)) {
-          possibleMoves.push(diagonalLeft);
-        }
+    } else if (x == 7) {
+      if (check_for_piece(diagonalLeft)) {
+        possibleMoves.push(diagonalLeft);
       }
     } else {
-      int diagonalRight[2] = {y - 1, x - 1};
-      int diagonalLeft[2] = {y - 1, x + 1};
-      int forward[2] = {y - 1, x};
-
-      if (check_for_piece(forward)) {
-        possibleMoves.push(forward);
+      if (check_for_piece(diagonalRight)) {
+        possibleMoves.push(diagonalRight);
       }
-      if (x == 0) {
-        if (check_for_piece(diagonalRight)) {
-          possibleMoves.push(diagonalRight);
-        }
-      } else if (x == 7) {
-        if (check_for_piece(diagonalLeft)) {
-          possibleMoves.push(diagonalLeft);
-        }
-      } else {
-        if (check_for_piece(diagonalRight)) {
-          possibleMoves.push(diagonalRight);
-        }
-        if (check_for_piece(diagonalLeft)) {
-          possibleMoves.push(diagonalLeft);
-        }
+      if (check_for_piece(diagonalLeft)) {
+        possibleMoves.push(diagonalLeft);
       }
     }
   }
@@ -124,10 +116,14 @@ stack<int[2]> check_moves(bool white, array<int, 2> position) {
 int main() {
   reset_board();
   display_board();
-  stack<int[2]> y = check_moves(true, {6, 2});
+  array<int, 2> p = {6, 2};
+  stack<array<int, 2> /* */> y = check_moves(true, p);
   while (!y.empty()) {
+    cout << y.top()[0] << " " << y.top()[1] << '\n';
     board[y.top()[0]][y.top()[1]] = 'x';
+    y.pop();
   }
+  display_board();
 }
 /*
 while(true){
@@ -138,7 +134,6 @@ while(true){
   //cin >> location;
 }
 */
-}
 
 /*
 board = {
