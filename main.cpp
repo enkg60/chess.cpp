@@ -6,12 +6,8 @@ using namespace std;
 
 char board[8][8];
 
-/*
-char display[10][18];
-//10 tall, 18 wide
-
-//chess = 9 tall 17 wide
-*/
+//planned display size: 10 tall, 18 wide
+//chess: 9 tall 17 wide
 
 void reset_board() {
 
@@ -52,34 +48,22 @@ bool check_for_piece(array<int, 2> location) {
   }
 }
 
-stack<array<int, 2> /* */> check_moves(bool white, array<int, 2> position) {
+stack<array<int, 2> > check_moves(bool white, array<int, 2> position) {
   int y = position[0];
   int x = position[1];
   char type = board[y][x];
 
-  stack<array<int, 2> /* */> possibleMoves;
+  stack<array<int, 2> > possibleMoves;
   if (type == 'p') {
-    /*diagonalRight = {y + (1*flip), x + (1*flip)};
-    diagonalLeft = {y + (1*flip), x - (1*flip)};
-    forward = {y + (1*flip), x};
-    int flip = 1;*/
-    array<int, 2> diagonalRight, diagonalLeft, forward;
-    if (white) {
-      diagonalRight[0] = y - 1;
-      diagonalRight[1] = x + 1;
-      diagonalLeft[0] = y - 1;
-      diagonalLeft[1] = x - 1;
-      forward[0] = y - 1;
-      forward[1] = x;
-    } else {
-      diagonalRight[0] = y + 1;
-      diagonalRight[1] = x - 1;
-      diagonalLeft[0] = y + 1;
-      diagonalLeft[1] = x + 1;
-      forward[0] = y + 1;
-      forward[1] = x;
+    int flip = 1;
+    
+    if (!white) {
+      flip = -1;
     }
-
+    array<int,2> diagonalRight = {y-(1*flip), x+(1*flip)};
+    array<int,2> diagonalLeft = {y-(1*flip), x-(1*flip)};
+    array<int,2> forward = {y-(1*flip), x};
+    
     if (!check_for_piece(forward)) {
       possibleMoves.push(forward);
     }
