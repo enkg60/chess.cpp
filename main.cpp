@@ -56,10 +56,10 @@ stack<array<int, 2> > possible_moves(bool white, array<int, 2> position) {
   stack<array<int, 2> > possibleMoves;
   if (type == 'p') {
     int flip = 1;
-    
     if (!white) {
       flip = -1;
     }
+    
     array<int,2> diagonalRight = {y-(1*flip), x+(1*flip)};
     array<int,2> diagonalLeft = {y-(1*flip), x-(1*flip)};
     array<int,2> forward = {y-(1*flip), x};
@@ -97,16 +97,19 @@ stack<array<int, 2> > possible_moves(bool white, array<int, 2> position) {
   return possibleMoves;
 }
 
+void print_possible_moves(bool white, array<int,2> position){
+  stack<array<int, 2> > possibleMoves = possible_moves(white, position);
+  while (!possibleMoves.empty()) {
+    board[possibleMoves.top()[0]][possibleMoves.top()[1]] = 'x';
+    possibleMoves.pop();
+  }
+}
+
 int main() {
   reset_board();
   display_board();
-  array<int, 2> p = {6, 2};
-  stack<array<int, 2> /* */> y = possible_moves(true, p);
-  while (!y.empty()) {
-    cout << y.top()[0] << " " << y.top()[1] << '\n';
-    board[y.top()[0]][y.top()[1]] = 'x';
-    y.pop();
-  }
+  array<int,2> x = {1, 4};
+  print_possible_moves(false, x);
   display_board();
 }
 /*
