@@ -65,22 +65,22 @@ stack<array<int, 2> /* */> check_moves(bool white, array<int, 2> position) {
     int flip = 1;*/
     array<int, 2> diagonalRight, diagonalLeft, forward;
     if (white) {
-      diagonalRight[0] = y + 1;
+      diagonalRight[0] = y - 1;
       diagonalRight[1] = x + 1;
-      diagonalLeft[0] = y + 1;
+      diagonalLeft[0] = y - 1;
       diagonalLeft[1] = x - 1;
-      forward[0] = y + 1;
+      forward[0] = y - 1;
       forward[1] = x;
     } else {
-      diagonalRight[0] = y - 1;
+      diagonalRight[0] = y + 1;
       diagonalRight[1] = x - 1;
-      diagonalLeft[0] = y - 1;
+      diagonalLeft[0] = y + 1;
       diagonalLeft[1] = x + 1;
-      forward[0] = y - 1;
+      forward[0] = y + 1;
       forward[1] = x;
     }
 
-    if (check_for_piece(forward)) {
+    if (!check_for_piece(forward)) {
       possibleMoves.push(forward);
     }
     if (x == 0) {
@@ -115,10 +115,13 @@ stack<array<int, 2> /* */> check_moves(bool white, array<int, 2> position) {
 
 int main() {
   reset_board();
+  display_board();
   array<int, 2> p = {6, 2};
   stack<array<int, 2> /* */> y = check_moves(true, p);
   while (!y.empty()) {
+    cout << y.top()[0] << " " << y.top()[1] << '\n';
     board[y.top()[0]][y.top()[1]] = 'x';
+    y.pop();
   }
   display_board();
 }
