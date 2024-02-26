@@ -52,8 +52,8 @@ stack<array<int, 2> > possible_moves(bool white, array<int, 2> position) {
   int y = position[0];
   int x = position[1];
   char type = board[y][x];
-
   stack<array<int, 2> > possibleMoves;
+
   if (type == 'p') {
     int flip = 1;
     if (!white) {
