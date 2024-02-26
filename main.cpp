@@ -48,7 +48,7 @@ bool check_for_piece(array<int, 2> location) {
   }
 }
 
-stack<array<int, 2> > check_moves(bool white, array<int, 2> position) {
+stack<array<int, 2> > possible_moves(bool white, array<int, 2> position) {
   int y = position[0];
   int x = position[1];
   char type = board[y][x];
@@ -101,7 +101,7 @@ int main() {
   reset_board();
   display_board();
   array<int, 2> p = {6, 2};
-  stack<array<int, 2> /* */> y = check_moves(true, p);
+  stack<array<int, 2> /* */> y = possible_moves(true, p);
   while (!y.empty()) {
     cout << y.top()[0] << " " << y.top()[1] << '\n';
     board[y.top()[0]][y.top()[1]] = 'x';
