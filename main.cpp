@@ -109,6 +109,7 @@ int main() {
   reset_board();
   display_board();
   array<int,2> x = {1, 4};
+  cout << "test";
   print_possible_moves(false, x);
   display_board();
 }
