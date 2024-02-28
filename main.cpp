@@ -218,6 +218,9 @@ void print_possible_moves(bool white, array<int, 2> position) {
 
 int main() {
   reset_board();
+  array<int, 2> x = {4, 5};
+  board[x[0]][x[1]] = 'r';
+  print_possible_moves(true, x);
   nerd_display_board();
 }
 /*
