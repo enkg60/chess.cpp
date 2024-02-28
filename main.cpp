@@ -1,8 +1,10 @@
+#include "termcolor.hpp"
 #include <array>
 #include <iostream>
 #include <stack>
 
 using namespace std;
+using namespace termcolor;
 
 char board[8][8];
 
@@ -41,7 +43,8 @@ void display_board() {
 }
 
 void nerd_display_board() {
-  cout << " ╔═══════════════╗\n";
+  bool color = true;
+  cout << " ╔════════════════════════╗\n";
   for (int y = 0; y < 8; y++) {
     for (int x = 0; x < 8; x++) {
       if (x == 0) {
@@ -71,16 +74,33 @@ void nerd_display_board() {
         icon = " ";
       }
       if (x == 7) {
-        cout << icon << "║";
+        if (color) {
+          cout << on_blue << " " << icon << " " << reset << "║";
+        } else {
+          cout << on_grey << " " << icon << " " << reset << "║";
+        }
       } else {
-        cout << icon << " ";
+        if (color) {
+          if (!(x % 2 == 0)) {
+            cout << on_blue << " " << icon << " " << reset;
+          } else {
+            cout << on_grey << " " << icon << " " << reset;
+          }
+        } else {
+          if (x % 2 == 0) {
+            cout << on_blue << " " << icon << " " << reset;
+          } else {
+            cout << on_grey << " " << icon << " " << reset;
+          }
+        }
       }
       // ▒░
     }
     cout << "\n";
+    color = !color;
   }
-  cout << " ╚═══════════════╝\n";
-  cout << "  a b c d e f g h\n";
+  cout << " ╚════════════════════════╝\n";
+  cout << "   a  b  c  d  e  f  g  h \n";
 }
 
 bool check_for_piece(array<int, 2> location) {
@@ -198,7 +218,6 @@ void print_possible_moves(bool white, array<int, 2> position) {
 
 int main() {
   reset_board();
-
   nerd_display_board();
 }
 /*
