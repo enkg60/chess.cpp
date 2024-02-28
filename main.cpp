@@ -73,6 +73,9 @@ void nerd_display_board() {
       if (type == '+') {
         icon = " ";
       }
+      if (type == 'x') {
+        icon = "x";
+      }
       if (x == 7) {
         if (color) {
           cout << on_blue << " " << icon << " " << reset << "║";
