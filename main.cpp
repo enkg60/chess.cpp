@@ -2,6 +2,12 @@
 #include <array>
 #include <iostream>
 #include <stack>
+//p = pawn
+//r = rook
+//h = horse/knight
+//b = bishop
+//q = queen
+//k = king
 
 using namespace std;
 using namespace termcolor;
