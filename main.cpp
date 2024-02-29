@@ -48,7 +48,7 @@ void nerd_display_board() {
   for (int y = 0; y < 8; y++) {
     for (int x = 0; x < 8; x++) {
       if (x == 0) {
-        cout << 8 - (y) << "║";
+        cout << y << "║";
       }
       char type = board[y][x];
       string icon;
@@ -103,7 +103,7 @@ void nerd_display_board() {
     color = !color;
   }
   cout << " ╚════════════════════════╝\n";
-  cout << "   a  b  c  d  e  f  g  h \n";
+  cout << "   0  1  2  3  4  5  6  7 \n";
 }
 
 bool check_for_piece(array<int, 2> location) {
@@ -176,12 +176,10 @@ stack<array<int, 2> /* */> possible_moves(bool white, array<int, 2> position) {
           break;
         }
         if (check_for_piece(forward) == false) {
-          cout << "FORWARD: " << forward[0] << "," << forward[1] << "\n";
           possibleMoves.push(forward);
           iterator++;
           continue;
         } else {
-        cout << "FORWARD: " << forward[0] << "," << forward[1] << "\n";
           possibleMoves.push(forward);
           break;
         }
@@ -290,8 +288,86 @@ stack<array<int, 2> /* */> possible_moves(bool white, array<int, 2> position) {
     }
   }
   if (type == 'k') {
+    array<int,2> forward;
+    for(int y1 = 1; y1 > -2; y1--){
+      for(int x1 = 1; x1 > -2; x1--){
+        forward[0] = y - y1;
+        forward[1] = x - x1;
+        if(x1 == 0 && y1 == 0){
+          continue;
+        }
+        if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 || forward[1] < 0) {
+          continue;
+        }
+        possibleMoves.push(forward);
+      }
+    }
   }
   if (type == 'q') {
+    for (int side = 0; side < 8; side++) {
+      int iterator = 1;
+      while (true) {
+        array<int, 2> forward;
+        if (side == 0) {
+          if (y == 0) {
+            break;
+          }
+          forward[0] = y - iterator;
+          forward[1] = x;
+        }
+        if (side == 1) {
+          if (y == 7) {
+            break;
+          }
+          forward[0] = y + iterator;
+          forward[1] = x;
+        }
+        if (side == 2) {
+          if (x == 0) {
+            break;
+          }
+          forward[0] = y;
+          forward[1] = x - iterator;
+        }
+        if (side == 3) {
+          if (x == 7) {
+            break;
+          }
+          forward[0] = y;
+          forward[1] = x + iterator;
+        }
+        if(side == 4){ //diagonalUpRight
+          forward[0] = y - iterator;
+          forward[1] = x + iterator;
+        }
+        if(side == 5){ //diagonalUpLeft
+          forward[0] = y - iterator;
+          forward[1] = x - iterator;
+        }
+        if(side == 6){ //diagonalDownRight
+          forward[0] = y + iterator;
+          forward[1] = x + iterator;
+        }
+        if(side == 7){ //diagonalDownLeft
+          forward[0] = y + iterator;
+          forward[1] = x - iterator;
+        }
+
+        if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
+            forward[1] < 0) {
+          break;
+        }
+
+        if (check_for_piece(forward) == false) {
+          possibleMoves.push(forward);
+          iterator++;
+          continue;
+        } else {
+          possibleMoves.push(forward);
+          break;
+        }
+      }
+    }
   }
   return possibleMoves;
 }
@@ -304,12 +380,33 @@ void print_possible_moves(bool white, array<int, 2> position) {
   }
 }
 
+array<int,2> convert_chess_notation_to_array(string input){
+  array<int,2> x;
+  x[0] = int(x[0]) - 96;
+  x[1] = input[1];
+
+  return x;
+}
+
 int main() {
   reset_board();
-  array<int, 2> x = {7, 1};
-  board[x[0]][x[1]] = 'h';
-  print_possible_moves(true, x);
   nerd_display_board();
+  while(true){
+    array<int,2> in1;
+    array<int,2> in2;
+    cout<<"piece to move:\ny: ";
+    cin >> in1[0];
+    cout<<"x: ";
+    cin >> in1[1];
+    print_possible_moves(true, in1);
+    nerd_display_board();
+
+    cout<<"position to move to:\ny: ";
+    cin >> in2[0];
+    cout<<"x: ";
+    cin >> in2[1];
+    nerd_display_board();
+  }
 }
 /*
 while(true){
