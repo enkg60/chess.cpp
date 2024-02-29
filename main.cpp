@@ -189,6 +189,55 @@ stack<array<int, 2> /* */> possible_moves(bool white, array<int, 2> position) {
     }
   }
   if (type == 'h') {
+    int iterator = 1;
+    while(true){
+      array<int,2> forward;
+      if(iterator == 1){
+        forward[0] = y-1;
+        forward[1] = x-2;
+      }
+      if(iterator == 2){
+        forward[0] = y-2;
+        forward[1] = x-1;
+      }
+      if(iterator == 3){
+        forward[0] = y-2;
+        forward[1] = x+1;
+      }
+      if(iterator == 4){
+        forward[0] = y-1;
+        forward[1] = x+2;
+      }
+      if(iterator == 5){
+        forward[0] = y+1;
+        forward[1] = x+2;
+      }
+      if(iterator == 6){
+        forward[0] = y+2;
+        forward[1] = x+1;
+      }
+      if(iterator == 7){
+        forward[0] = y+2;
+        forward[1] = x-1;
+      }
+      if(iterator == 8){
+        forward[0] = y+1;
+        forward[1] = x-2;
+      }
+
+      iterator++;
+      if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
+          forward[1] < 0) {
+        if(iterator == 9){
+          break;
+        }
+        continue;
+      }
+      possibleMoves.push(forward);
+      if(iterator == 9){
+        break;
+      }
+    }
   }
   if (type == 'r') {
     for (int side = 0; side < 4; side++) {
@@ -257,8 +306,8 @@ void print_possible_moves(bool white, array<int, 2> position) {
 
 int main() {
   reset_board();
-  array<int, 2> x = {4, 5};
-  board[x[0]][x[1]] = 'b';
+  array<int, 2> x = {7, 1};
+  board[x[0]][x[1]] = 'h';
   print_possible_moves(true, x);
   nerd_display_board();
 }
