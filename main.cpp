@@ -1,5 +1,6 @@
 #include "termcolor.hpp"
 #include <array>
+// #include <cmath> don't know why this is here
 #include <iostream>
 #include <stack>
 // p = pawn
@@ -436,11 +437,46 @@ void print_possible_moves(array<int, 2> position) {
 }
 
 array<int, 2> convert_chess_notation_to_array(string input) {
+  // not finished
   array<int, 2> x;
   x[0] = int(x[0]) - 96;
   x[1] = input[1];
 
   return x;
+}
+
+bool move_piece(array<int, 2> position, array<int, 2> target) {
+  stack<array<int, 2> /* */> possibleMoves = possible_moves(position);
+  int positionY = position[0];
+  int positionX = position[1];
+  int targetY = target[0];
+  int targetX = target[1];
+  bool condition = true;
+  bool ifFunctionWorked = false;
+
+  for (int i = 0; i < possibleMoves.size(); i++) {
+    /*
+    cout << "POSSIBLE TOP:" << possibleMoves.top()[0] << ","
+       << possibleMoves.top()[1] << "\n TARGET: " << targetY << ','
+       << targetX;
+       */
+    if (possibleMoves.top()[0] == targetY &&
+        possibleMoves.top()[1] == targetX) {
+      board[targetY][targetX].type = board[positionY][positionX].type;
+      board[positionY][positionX].type = '+';
+      ifFunctionWorked = true;
+    } else {
+      possibleMoves.pop();
+    }
+  }
+
+  if (ifFunctionWorked) {
+    cout << "WORKED\n";
+  } else {
+    cout << "DID NOT WORKED\n";
+  }
+
+  return ifFunctionWorked;
 }
 
 int main() {
@@ -460,18 +496,10 @@ int main() {
     cin >> in2[0];
     cout << "x: ";
     cin >> in2[1];
+    move_piece(in1, in2);
     nerd_display_board();
   }
 }
-/*
-while(true){
-  cout << "piece to move (line 1) and where (line 2)"
-  string piece;
-  cin >> piece;
-  //string location;
-  //cin >> location;
-}
-*/
 
 /*
 board = {
