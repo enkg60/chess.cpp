@@ -1,5 +1,6 @@
 #include "termcolor.hpp"
 #include <array>
+#include <cmath>
 #include <iostream>
 #include <stack>
 // p = pawn
@@ -441,6 +442,21 @@ array<int, 2> convert_chess_notation_to_array(string input) {
   x[1] = input[1];
 
   return x;
+}
+
+bool move_piece(array<int,2> position, array<int,2> target){
+  stack<array<int, 2> /* */> possibleMoves = possible_moves(position);
+  int targetX = target[1];
+  int targetY = target[0];
+  bool x = true;
+    
+
+  while(x){
+    if(possible_moves.top()[0] == targetY && possible_moves.top()[1] == targetX){
+      x = false;
+    }
+  }
+  return false;
 }
 
 int main() {
