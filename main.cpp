@@ -12,29 +12,37 @@
 using namespace std;
 using namespace termcolor;
 
-char board[8][8];
-
-// planned display size: 10 tall, 18 wide
-// chess: 9 tall 17 wide
-
 struct piece {
   char type;
   bool white;
 };
 
+piece board[8][8];
+
+// planned display size: 10 tall, 18 wide
+// chess: 9 tall 17 wide
+
+piece create_piece(char type, bool white) {
+  piece piece;
+  piece.type = type;
+  piece.white = white;
+  return piece;
+}
+
 void reset_board() {
-
-  char pawns[8] = {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'};
-  char others[8] = {'r', 'h', 'b', 'q', 'k', 'b', 'h', 'r'};
-
+  char pieces[8] = {'r', 'h', 'b', 'q', 'k', 'b', 'h', 'r'};
   for (int y = 0; y < 8; y++) {
     for (int x = 0; x < 8; x++) {
-      if (y == 0 || y == 7) {
-        board[y][x] = others[x];
-      } else if (y == 1 || y == 6) {
-        board[y][x] = pawns[x];
+      if (y == 0) {
+        board[y][x] = create_piece(pieces[x], false);
+      } else if (y == 7) {
+        board[y][x] = create_piece(pieces[x], true);
+      } else if (y == 1) {
+        board[y][x] = create_piece('p', false);
+      } else if (y == 6) {
+        board[y][x] = create_piece('p', true);
       } else {
-        board[y][x] = '+';
+        board[y][x] = create_piece('+', false);
       }
     }
   }
@@ -46,7 +54,7 @@ void display_board() {
       if (x == 0) {
         cout << 8 - (y) << ' ';
       }
-      cout << board[y][x] << ' ';
+      cout << board[y][x].type << ' ';
     }
     cout << "\n";
   }
@@ -61,7 +69,7 @@ void nerd_display_board() {
       if (x == 0) {
         cout << y << "║";
       }
-      char type = board[y][x];
+      char type = board[y][x].type;
       string icon;
       if (type == 'p') {
         icon = "󰡙";
@@ -118,276 +126,311 @@ void nerd_display_board() {
 }
 
 bool check_for_piece(array<int, 2> location) {
-  if (board[location[0]][location[1]] != '+') {
+  if (board[location[0]][location[1]].type != '+') {
     return true;
   } else {
     return false;
   }
 }
 
-stack<array<int, 2> /* */> possible_moves(bool white, array<int, 2> position) {
-  int y = position[0];
-  int x = position[1];
-  char type = board[y][x];
+stack<array<int, 2> /* */> possible_pawn_moves(int y, int x) {
   stack<array<int, 2> /* */> possibleMoves;
+  int flip = 1;
+  if (board[y][x].white == false) {
+    flip = -1;
+  }
 
-  if (type == 'p') {
-    int flip = 1;
-    if (!white) {
-      flip = -1;
+  array<int, 2> diagonalRight = {y - (1 * flip), x + (1 * flip)};
+  array<int, 2> diagonalLeft = {y - (1 * flip), x - (1 * flip)};
+  array<int, 2> forward = {y - (1 * flip), x};
+
+  if (!check_for_piece(forward)) {
+    possibleMoves.push(forward);
+  }
+  if (x == 0) {
+    if (check_for_piece(diagonalRight)) {
+      possibleMoves.push(diagonalRight);
     }
-
-    array<int, 2> diagonalRight = {y - (1 * flip), x + (1 * flip)};
-    array<int, 2> diagonalLeft = {y - (1 * flip), x - (1 * flip)};
-    array<int, 2> forward = {y - (1 * flip), x};
-
-    if (!check_for_piece(forward)) {
-      possibleMoves.push(forward);
+  } else if (x == 7) {
+    if (check_for_piece(diagonalLeft)) {
+      possibleMoves.push(diagonalLeft);
     }
-    if (x == 0) {
-      if (check_for_piece(diagonalRight)) {
-        possibleMoves.push(diagonalRight);
-      }
-    } else if (x == 7) {
-      if (check_for_piece(diagonalLeft)) {
-        possibleMoves.push(diagonalLeft);
-      }
-    } else {
-      if (check_for_piece(diagonalRight)) {
-        possibleMoves.push(diagonalRight);
-      }
-      if (check_for_piece(diagonalLeft)) {
-        possibleMoves.push(diagonalLeft);
-      }
+  } else {
+    if (check_for_piece(diagonalRight)) {
+      possibleMoves.push(diagonalRight);
+    }
+    if (check_for_piece(diagonalLeft)) {
+      possibleMoves.push(diagonalLeft);
     }
   }
-  if (type == 'b') {
-    for (int side = 0; side < 4; side++) {
-      int iterator = 1;
-      while (true) {
-        array<int, 2> forward;
-        if (side == 0) { // diagonalUpRight
-          forward[0] = y - iterator;
-          forward[1] = x + iterator;
-        }
-        if (side == 1) { // diagonalUpLeft
-          forward[0] = y - iterator;
-          forward[1] = x - iterator;
-        }
-        if (side == 2) { // diagonalDownRight
-          forward[0] = y + iterator;
-          forward[1] = x + iterator;
-        }
-        if (side == 3) { // diagonalDownLeft
-          forward[0] = y + iterator;
-          forward[1] = x - iterator;
-        }
-        if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
-            forward[1] < 0) {
-          break;
-        }
-        if (check_for_piece(forward) == false) {
-          possibleMoves.push(forward);
-          iterator++;
-          continue;
-        } else {
-          possibleMoves.push(forward);
-          break;
-        }
-      }
-    }
-  }
-  if (type == 'h') {
+  return possibleMoves;
+}
+
+stack<array<int, 2> /* */> possible_bishop_moves(int y, int x) {
+  stack<array<int, 2> /* */> possibleMoves;
+  for (int side = 0; side < 4; side++) {
     int iterator = 1;
     while (true) {
       array<int, 2> forward;
-      if (iterator == 1) {
-        forward[0] = y - 1;
-        forward[1] = x - 2;
+      if (side == 0) { // diagonalUpRight
+        forward[0] = y - iterator;
+        forward[1] = x + iterator;
       }
-      if (iterator == 2) {
-        forward[0] = y - 2;
-        forward[1] = x - 1;
+      if (side == 1) { // diagonalUpLeft
+        forward[0] = y - iterator;
+        forward[1] = x - iterator;
       }
-      if (iterator == 3) {
-        forward[0] = y - 2;
-        forward[1] = x + 1;
+      if (side == 2) { // diagonalDownRight
+        forward[0] = y + iterator;
+        forward[1] = x + iterator;
       }
-      if (iterator == 4) {
-        forward[0] = y - 1;
-        forward[1] = x + 2;
+      if (side == 3) { // diagonalDownLeft
+        forward[0] = y + iterator;
+        forward[1] = x - iterator;
       }
-      if (iterator == 5) {
-        forward[0] = y + 1;
-        forward[1] = x + 2;
-      }
-      if (iterator == 6) {
-        forward[0] = y + 2;
-        forward[1] = x + 1;
-      }
-      if (iterator == 7) {
-        forward[0] = y + 2;
-        forward[1] = x - 1;
-      }
-      if (iterator == 8) {
-        forward[0] = y + 1;
-        forward[1] = x - 2;
-      }
-
-      iterator++;
       if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
           forward[1] < 0) {
-        if (iterator == 9) {
-          break;
-        }
-        continue;
-      }
-      possibleMoves.push(forward);
-      if (iterator == 9) {
         break;
       }
-    }
-  }
-  if (type == 'r') {
-    for (int side = 0; side < 4; side++) {
-      int iterator = 1;
-      while (true) {
-        array<int, 2> forward;
-        if (side == 0) {
-          if (y == 0) {
-            break;
-          }
-          forward[0] = y - iterator;
-          forward[1] = x;
-        }
-        if (side == 1) {
-          if (y == 7) {
-            break;
-          }
-          forward[0] = y + iterator;
-          forward[1] = x;
-        }
-        if (side == 2) {
-          if (x == 0) {
-            break;
-          }
-          forward[0] = y;
-          forward[1] = x - iterator;
-        }
-        if (side == 3) {
-          if (x == 7) {
-            break;
-          }
-          forward[0] = y;
-          forward[1] = x + iterator;
-        }
-
-        if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
-            forward[1] < 0) {
-          break;
-        }
-
-        if (check_for_piece(forward) == false) {
-          possibleMoves.push(forward);
-          iterator++;
-          continue;
-        } else {
-          possibleMoves.push(forward);
-          break;
-        }
-      }
-    }
-  }
-  if (type == 'k') {
-    array<int, 2> forward;
-    for (int y1 = 1; y1 > -2; y1--) {
-      for (int x1 = 1; x1 > -2; x1--) {
-        forward[0] = y - y1;
-        forward[1] = x - x1;
-        if (x1 == 0 && y1 == 0) {
-          continue;
-        }
-        if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
-            forward[1] < 0) {
-          continue;
-        }
+      if (check_for_piece(forward) == false) {
         possibleMoves.push(forward);
-      }
-    }
-  }
-  if (type == 'q') {
-    for (int side = 0; side < 8; side++) {
-      int iterator = 1;
-      while (true) {
-        array<int, 2> forward;
-        if (side == 0) {
-          if (y == 0) {
-            break;
-          }
-          forward[0] = y - iterator;
-          forward[1] = x;
-        }
-        if (side == 1) {
-          if (y == 7) {
-            break;
-          }
-          forward[0] = y + iterator;
-          forward[1] = x;
-        }
-        if (side == 2) {
-          if (x == 0) {
-            break;
-          }
-          forward[0] = y;
-          forward[1] = x - iterator;
-        }
-        if (side == 3) {
-          if (x == 7) {
-            break;
-          }
-          forward[0] = y;
-          forward[1] = x + iterator;
-        }
-        if (side == 4) { // diagonalUpRight
-          forward[0] = y - iterator;
-          forward[1] = x + iterator;
-        }
-        if (side == 5) { // diagonalUpLeft
-          forward[0] = y - iterator;
-          forward[1] = x - iterator;
-        }
-        if (side == 6) { // diagonalDownRight
-          forward[0] = y + iterator;
-          forward[1] = x + iterator;
-        }
-        if (side == 7) { // diagonalDownLeft
-          forward[0] = y + iterator;
-          forward[1] = x - iterator;
-        }
-
-        if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
-            forward[1] < 0) {
-          break;
-        }
-
-        if (check_for_piece(forward) == false) {
-          possibleMoves.push(forward);
-          iterator++;
-          continue;
-        } else {
-          possibleMoves.push(forward);
-          break;
-        }
+        iterator++;
+        continue;
+      } else {
+        possibleMoves.push(forward);
+        break;
       }
     }
   }
   return possibleMoves;
 }
 
-void print_possible_moves(bool white, array<int, 2> position) {
-  stack<array<int, 2> /* */> possibleMoves = possible_moves(white, position);
+stack<array<int, 2> /* */> possible_knight_moves(int y, int x) {
+  stack<array<int, 2> /* */> possibleMoves;
+  int iterator = 1;
+  while (true) {
+    array<int, 2> forward;
+    if (iterator == 1) {
+      forward[0] = y - 1;
+      forward[1] = x - 2;
+    }
+    if (iterator == 2) {
+      forward[0] = y - 2;
+      forward[1] = x - 1;
+    }
+    if (iterator == 3) {
+      forward[0] = y - 2;
+      forward[1] = x + 1;
+    }
+    if (iterator == 4) {
+      forward[0] = y - 1;
+      forward[1] = x + 2;
+    }
+    if (iterator == 5) {
+      forward[0] = y + 1;
+      forward[1] = x + 2;
+    }
+    if (iterator == 6) {
+      forward[0] = y + 2;
+      forward[1] = x + 1;
+    }
+    if (iterator == 7) {
+      forward[0] = y + 2;
+      forward[1] = x - 1;
+    }
+    if (iterator == 8) {
+      forward[0] = y + 1;
+      forward[1] = x - 2;
+    }
+
+    iterator++;
+    if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 || forward[1] < 0) {
+      if (iterator == 9) {
+        break;
+      }
+      continue;
+    }
+    possibleMoves.push(forward);
+    if (iterator == 9) {
+      break;
+    }
+  }
+  return possibleMoves;
+}
+
+stack<array<int, 2> /* */> possible_rook_moves(int y, int x) {
+  stack<array<int, 2> /* */> possibleMoves;
+  for (int side = 0; side < 4; side++) {
+    int iterator = 1;
+    while (true) {
+      array<int, 2> forward;
+      if (side == 0) {
+        if (y == 0) {
+          break;
+        }
+        forward[0] = y - iterator;
+        forward[1] = x;
+      }
+      if (side == 1) {
+        if (y == 7) {
+          break;
+        }
+        forward[0] = y + iterator;
+        forward[1] = x;
+      }
+      if (side == 2) {
+        if (x == 0) {
+          break;
+        }
+        forward[0] = y;
+        forward[1] = x - iterator;
+      }
+      if (side == 3) {
+        if (x == 7) {
+          break;
+        }
+        forward[0] = y;
+        forward[1] = x + iterator;
+      }
+
+      if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
+          forward[1] < 0) {
+        break;
+      }
+
+      if (check_for_piece(forward) == false) {
+        possibleMoves.push(forward);
+        iterator++;
+        continue;
+      } else {
+        possibleMoves.push(forward);
+        break;
+      }
+    }
+  }
+  return possibleMoves;
+}
+
+stack<array<int, 2> /* */> possible_king_moves(int y, int x) {
+  stack<array<int, 2> /* */> possibleMoves;
+  array<int, 2> forward;
+  for (int y1 = 1; y1 > -2; y1--) {
+    for (int x1 = 1; x1 > -2; x1--) {
+      forward[0] = y - y1;
+      forward[1] = x - x1;
+      if (x1 == 0 && y1 == 0) {
+        continue;
+      }
+      if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
+          forward[1] < 0) {
+        continue;
+      }
+      possibleMoves.push(forward);
+    }
+  }
+  return possibleMoves;
+}
+
+stack<array<int, 2> /* */> possible_queen_moves(int y, int x) {
+  stack<array<int, 2> /* */> possibleMoves;
+  for (int side = 0; side < 8; side++) {
+    int iterator = 1;
+    while (true) {
+      array<int, 2> forward;
+      if (side == 0) {
+        if (y == 0) {
+          break;
+        }
+        forward[0] = y - iterator;
+        forward[1] = x;
+      }
+      if (side == 1) {
+        if (y == 7) {
+          break;
+        }
+        forward[0] = y + iterator;
+        forward[1] = x;
+      }
+      if (side == 2) {
+        if (x == 0) {
+          break;
+        }
+        forward[0] = y;
+        forward[1] = x - iterator;
+      }
+      if (side == 3) {
+        if (x == 7) {
+          break;
+        }
+        forward[0] = y;
+        forward[1] = x + iterator;
+      }
+      if (side == 4) { // diagonalUpRight
+        forward[0] = y - iterator;
+        forward[1] = x + iterator;
+      }
+      if (side == 5) { // diagonalUpLeft
+        forward[0] = y - iterator;
+        forward[1] = x - iterator;
+      }
+      if (side == 6) { // diagonalDownRight
+        forward[0] = y + iterator;
+        forward[1] = x + iterator;
+      }
+      if (side == 7) { // diagonalDownLeft
+        forward[0] = y + iterator;
+        forward[1] = x - iterator;
+      }
+
+      if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
+          forward[1] < 0) {
+        break;
+      }
+
+      if (check_for_piece(forward) == false) {
+        possibleMoves.push(forward);
+        iterator++;
+        continue;
+      } else {
+        possibleMoves.push(forward);
+        break;
+      }
+    }
+  }
+  return possibleMoves;
+}
+
+stack<array<int, 2> /* */> possible_moves(array<int, 2> position) {
+  int y = position[0];
+  int x = position[1];
+  char type = board[y][x].type;
+  stack<array<int, 2> /* */> possibleMoves;
+  if (type == 'p') {
+    possibleMoves = possible_pawn_moves(y, x);
+  }
+  if (type == 'b') {
+    possibleMoves = possible_bishop_moves(y, x);
+  }
+
+  if (type == 'h') {
+    possibleMoves = possible_knight_moves(y, x);
+  }
+  if (type == 'r') {
+    possibleMoves = possible_rook_moves(y, x);
+  }
+  if (type == 'k') {
+    possibleMoves = possible_king_moves(y, x);
+  }
+  if (type == 'q') {
+    possibleMoves = possible_king_moves(y, x);
+  }
+  return possibleMoves;
+}
+
+void print_possible_moves(array<int, 2> position) {
+  stack<array<int, 2> /* */> possibleMoves = possible_moves(position);
   while (!possibleMoves.empty()) {
-    board[possibleMoves.top()[0]][possibleMoves.top()[1]] = 'x';
+    board[possibleMoves.top()[0]][possibleMoves.top()[1]].type = 'x';
     possibleMoves.pop();
   }
 }
@@ -410,7 +453,7 @@ int main() {
     cin >> in1[0];
     cout << "x: ";
     cin >> in1[1];
-    print_possible_moves(true, in1);
+    print_possible_moves(in1);
     nerd_display_board();
 
     cout << "position to move to:\ny: ";
