@@ -3,6 +3,7 @@
 // #include <cmath> don't know why this is here
 #include <iostream>
 #include <stack>
+#include <sys/wait.h>
 // p = pawn
 // r = rook
 // h = horse/knight
@@ -13,9 +14,14 @@
 using namespace std;
 using namespace termcolor;
 
+stack<array<int, 2> /* */> emptyStack;
+// just a empty stack to pass to nerd_display_board
+
 struct piece {
   char type;
-  bool white;
+  bool white; // issue here because empty spots on the board have a color
+  // possible solution is to turn it into an int where
+  // 1 = white, 2 = black and 0 = nothing
 };
 
 piece board[8][8];
@@ -62,15 +68,37 @@ void display_board() {
   cout << "  a b c d e f g h\n";
 }
 
-void nerd_display_board() {
+void nerd_display_board(stack<array<int, 2> /* */> possibleMoves) {
+  // bad thing about having to pass argument is that if i just want to print
+  // board i have to pass a empty stack
   bool color = true;
+  piece tempBoard[8][8];
+
+  // this 2d for loop is just to copy board to tempBoard
+  for (int y = 0; y < 8; y++) {
+    for (int x = 0; x < 8; x++) {
+      tempBoard[y][x] = board[y][x];
+    }
+  }
+
+  while (!possibleMoves.empty()) {
+    // get the position of the possible move and replace it with a 'x' on the
+    // temp board
+    tempBoard[possibleMoves.top()[0]][possibleMoves.top()[1]].type = 'x';
+    possibleMoves.pop();
+  }
+
+  // doing all this temp board stuff allows us to overlay possibleMoves
+  // without changing the actual board. this is essentially a poorly stitched
+  // display system, will make a real display system later
+
   cout << " ╔════════════════════════╗\n";
   for (int y = 0; y < 8; y++) {
     for (int x = 0; x < 8; x++) {
       if (x == 0) {
         cout << y << "║";
       }
-      char type = board[y][x].type;
+      char type = tempBoard[y][x].type;
       string icon;
       if (type == 'p') {
         icon = "󰡙";
@@ -96,24 +124,55 @@ void nerd_display_board() {
       if (type == 'x') {
         icon = "x";
       }
+
+      // CODE BELOW IS HORRENDOUS
+      // goal is to print the checkered board and color the piece
+      // if it's to hard to understand, ask me, cause it's just bad code ngl
+      // going to fix later
       if (x == 7) {
         if (color) {
-          cout << on_blue << " " << icon << " " << reset << "║";
+          if (tempBoard[y][x].white) {
+            cout << on_blue << " " << white << icon << " " << reset << "║";
+          } else {
+            cout << on_blue << " " << grey << icon << " " << reset << "║";
+          }
         } else {
-          cout << on_grey << " " << icon << " " << reset << "║";
+          if (tempBoard[y][x].white) {
+            cout << on_bright_grey << " " << white << icon << " " << reset
+                 << "║";
+          } else {
+            cout << on_bright_grey << " " << grey << icon << " " << reset
+                 << "║";
+          }
         }
       } else {
         if (color) {
           if (!(x % 2 == 0)) {
-            cout << on_blue << " " << icon << " " << reset;
+            if (tempBoard[y][x].white) {
+              cout << on_blue << " " << white << icon << " " << reset;
+            } else {
+              cout << on_blue << " " << grey << icon << " " << reset;
+            }
           } else {
-            cout << on_grey << " " << icon << " " << reset;
+            if (tempBoard[y][x].white) {
+              cout << on_bright_grey << " " << white << icon << " " << reset;
+            } else {
+              cout << on_bright_grey << " " << grey << icon << " " << reset;
+            }
           }
         } else {
           if (x % 2 == 0) {
-            cout << on_blue << " " << icon << " " << reset;
+            if (tempBoard[y][x].white) {
+              cout << on_blue << " " << white << icon << " " << reset;
+            } else {
+              cout << on_blue << " " << grey << icon << " " << reset;
+            }
           } else {
-            cout << on_grey << " " << icon << " " << reset;
+            if (tempBoard[y][x].white) {
+              cout << on_bright_grey << " " << white << icon << " " << reset;
+            } else {
+              cout << on_bright_grey << " " << grey << icon << " " << reset;
+            }
           }
         }
       }
@@ -428,13 +487,17 @@ stack<array<int, 2> /* */> possible_moves(array<int, 2> position) {
   return possibleMoves;
 }
 
-void print_possible_moves(array<int, 2> position) {
-  stack<array<int, 2> /* */> possibleMoves = possible_moves(position);
+/*
+REIMPLEMENT ONCE DISPLAY SYSTEM IS FINSIHED
+
+void overlay_possible_moves(array<int, 2> position) {
+  stack<array<int, 2> > possibleMoves = possible_moves(position);
   while (!possibleMoves.empty()) {
     board[possibleMoves.top()[0]][possibleMoves.top()[1]].type = 'x';
     possibleMoves.pop();
   }
 }
+*/
 
 array<int, 2> convert_chess_notation_to_array(string input) {
   // not finished
@@ -455,14 +518,13 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
   bool ifFunctionWorked = false;
 
   for (int i = 0; i < possibleMoves.size(); i++) {
-    /*
-    cout << "POSSIBLE TOP:" << possibleMoves.top()[0] << ","
-       << possibleMoves.top()[1] << "\n TARGET: " << targetY << ','
-       << targetX;
-       */
     if (possibleMoves.top()[0] == targetY &&
         possibleMoves.top()[1] == targetX) {
+      // copy over properties of piece to target
       board[targetY][targetX].type = board[positionY][positionX].type;
+      board[targetY][targetX].white = board[positionY][positionX].white;
+
+      // replace piece with empty spot
       board[positionY][positionX].type = '+';
       ifFunctionWorked = true;
     } else {
@@ -481,7 +543,7 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
 
 int main() {
   reset_board();
-  nerd_display_board();
+  nerd_display_board(emptyStack);
   while (true) {
     array<int, 2> in1;
     array<int, 2> in2;
@@ -489,15 +551,15 @@ int main() {
     cin >> in1[0];
     cout << "x: ";
     cin >> in1[1];
-    print_possible_moves(in1);
-    nerd_display_board();
+    nerd_display_board(possible_moves(in1));
 
     cout << "position to move to:\ny: ";
     cin >> in2[0];
     cout << "x: ";
     cin >> in2[1];
     move_piece(in1, in2);
-    nerd_display_board();
+    nerd_display_board(emptyStack);
+    display_board();
   }
 }
 
