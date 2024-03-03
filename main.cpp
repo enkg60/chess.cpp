@@ -514,7 +514,6 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
   int positionX = position[1];
   int targetY = target[0];
   int targetX = target[1];
-  bool condition = true;
   bool ifFunctionWorked = false;
 
   for (int i = 0; i < possibleMoves.size(); i++) {
