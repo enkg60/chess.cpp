@@ -12,7 +12,6 @@
 // k = king
 
 using namespace std;
-using namespace termcolor;
 
 stack<array<int, 2> /* */> emptyStack;
 
@@ -22,20 +21,22 @@ vector<char> takenWhite;
 
 struct piece {
   char type;
-  bool white; // issue here because empty spots on the board have a color
-  // possible solution is to turn it into an int where
+  int color;
   // 1 = white, 2 = black and 0 = nothing
 };
+int white = 1;
+int black = 2;
+int nothing = 0;
 
 piece board[8][8];
 
 // planned display size: 10 tall, 18 wide
 // chess: 9 tall 17 wide
 
-piece create_piece(char type, bool white) {
+piece create_piece(char type, int color) {
   piece piece;
   piece.type = type;
-  piece.white = white;
+  piece.color = color;
   return piece;
 }
 
@@ -44,15 +45,15 @@ void reset_board() {
   for (int y = 0; y < 8; y++) {
     for (int x = 0; x < 8; x++) {
       if (y == 0) {
-        board[y][x] = create_piece(pieces[x], false);
+        board[y][x] = create_piece(pieces[x], black);
       } else if (y == 7) {
-        board[y][x] = create_piece(pieces[x], true);
+        board[y][x] = create_piece(pieces[x], white);
       } else if (y == 1) {
-        board[y][x] = create_piece('p', false);
+        board[y][x] = create_piece('p', black);
       } else if (y == 6) {
-        board[y][x] = create_piece('p', true);
+        board[y][x] = create_piece('p', white);
       } else {
-        board[y][x] = create_piece('+', false);
+        board[y][x] = create_piece('+', nothing);
       }
     }
   }
@@ -88,6 +89,7 @@ void nerd_display_board(stack<array<int, 2> /* */> possibleMoves) {
     // get the position of the possible move and replace it with a 'x' on the
     // temp board
     tempBoard[possibleMoves.top()[0]][possibleMoves.top()[1]].type = 'x';
+    tempBoard[possibleMoves.top()[0]][possibleMoves.top()[1]].color = nothing;
     possibleMoves.pop();
   }
 
@@ -134,47 +136,75 @@ void nerd_display_board(stack<array<int, 2> /* */> possibleMoves) {
       // going to fix later
       if (x == 7) {
         if (color) {
-          if (tempBoard[y][x].white) {
-            cout << on_blue << " " << white << icon << " " << reset << "║";
+          if (tempBoard[y][x].color == white) {
+            cout << termcolor::on_blue << " " << termcolor::white << icon << " "
+                 << termcolor::reset << "║";
+          } else if (tempBoard[y][x].color == black) {
+            cout << termcolor::on_blue << " " << termcolor::grey << icon << " "
+                 << termcolor::reset << "║";
           } else {
-            cout << on_blue << " " << grey << icon << " " << reset << "║";
+            cout << termcolor::on_blue << " " << termcolor::bright_red << icon
+                 << " " << termcolor::reset << "║";
           }
         } else {
-          if (tempBoard[y][x].white) {
-            cout << on_bright_grey << " " << white << icon << " " << reset
-                 << "║";
+          if (tempBoard[y][x].color == white) {
+            cout << termcolor::on_bright_grey << " " << termcolor::white << icon
+                 << " " << termcolor::reset << "║";
+          } else if (tempBoard[y][x].color == black) {
+            cout << termcolor::on_bright_grey << " " << termcolor::grey << icon
+                 << " " << termcolor::reset << "║";
           } else {
-            cout << on_bright_grey << " " << grey << icon << " " << reset
-                 << "║";
+            cout << termcolor::on_bright_grey << " " << termcolor::bright_red
+                 << icon << " " << termcolor::reset << "║";
           }
         }
       } else {
         if (color) {
           if (!(x % 2 == 0)) {
-            if (tempBoard[y][x].white) {
-              cout << on_blue << " " << white << icon << " " << reset;
+            if (tempBoard[y][x].color == white) {
+              cout << termcolor::on_blue << " " << termcolor::white << icon
+                   << " " << termcolor::reset;
+            } else if (tempBoard[y][x].color == black) {
+              cout << termcolor::on_blue << " " << termcolor::grey << icon
+                   << " " << termcolor::reset;
             } else {
-              cout << on_blue << " " << grey << icon << " " << reset;
+              cout << termcolor::on_blue << " " << termcolor::bright_red << icon
+                   << " " << termcolor::reset;
             }
           } else {
-            if (tempBoard[y][x].white) {
-              cout << on_bright_grey << " " << white << icon << " " << reset;
+            if (tempBoard[y][x].color == white) {
+              cout << termcolor::on_bright_grey << " " << termcolor::white
+                   << icon << " " << termcolor::reset;
+            } else if (tempBoard[y][x].color == black) {
+              cout << termcolor::on_bright_grey << " " << termcolor::grey
+                   << icon << " " << termcolor::reset;
             } else {
-              cout << on_bright_grey << " " << grey << icon << " " << reset;
+              cout << termcolor::on_bright_grey << " " << termcolor::bright_red
+                   << icon << " " << termcolor::reset;
             }
           }
         } else {
           if (x % 2 == 0) {
-            if (tempBoard[y][x].white) {
-              cout << on_blue << " " << white << icon << " " << reset;
+            if (tempBoard[y][x].color == white) {
+              cout << termcolor::on_blue << " " << termcolor::white << icon
+                   << " " << termcolor::reset;
+            } else if (tempBoard[y][x].color == black) {
+              cout << termcolor::on_blue << " " << termcolor::grey << icon
+                   << " " << termcolor::reset;
             } else {
-              cout << on_blue << " " << grey << icon << " " << reset;
+              cout << termcolor::on_blue << " " << termcolor::bright_red << icon
+                   << " " << termcolor::reset;
             }
           } else {
-            if (tempBoard[y][x].white) {
-              cout << on_bright_grey << " " << white << icon << " " << reset;
+            if (tempBoard[y][x].color == white) {
+              cout << termcolor::on_bright_grey << " " << termcolor::white
+                   << icon << " " << termcolor::reset;
+            } else if (tempBoard[y][x].color == black) {
+              cout << termcolor::on_bright_grey << " " << termcolor::grey
+                   << icon << " " << termcolor::reset;
             } else {
-              cout << on_bright_grey << " " << grey << icon << " " << reset;
+              cout << termcolor::on_bright_grey << " " << termcolor::bright_red
+                   << icon << " " << termcolor::reset;
             }
           }
         }
@@ -208,7 +238,7 @@ bool check_for_piece(array<int, 2> location) {
 stack<array<int, 2> /* */> possible_pawn_moves(int y, int x) {
   stack<array<int, 2> /* */> possibleMoves;
   int flip = 1;
-  if (board[y][x].white == false) {
+  if (board[y][x].color == black) {
     flip = -1;
   }
 
@@ -321,7 +351,7 @@ stack<array<int, 2> /* */> possible_knight_moves(int y, int x) {
       }
       continue;
     }
-    if (board[forward[0]][forward[1]].white == board[y][x].white) {
+    if (board[forward[0]][forward[1]].color == board[y][x].color) {
       if (iterator == 9) {
         break;
       }
@@ -542,7 +572,7 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
       // check if the target is piece and if it is push it to taken pieces in
       // it's color
       if (check_for_piece(target)) {
-        if (board[targetY][targetX].white) {
+        if (board[targetY][targetX].color == white) {
           takenWhite.push_back(board[targetY][targetX].type);
         } else {
           takenBlack.push_back(board[targetY][targetX].type);
@@ -551,10 +581,11 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
 
       // copy over properties of piece to target
       board[targetY][targetX].type = board[positionY][positionX].type;
-      board[targetY][targetX].white = board[positionY][positionX].white;
+      board[targetY][targetX].color = board[positionY][positionX].color;
 
       // replace piece with empty spot
       board[positionY][positionX].type = '+';
+      board[positionY][positionX].color = nothing;
       ifFunctionWorked = true;
       break;
     } else {
@@ -567,8 +598,6 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
 
 int main() {
   reset_board();
-  board[2][3].type = 'p';
-  board[2][3].white = true;
   nerd_display_board(emptyStack);
   while (true) {
     array<int, 2> in1;
