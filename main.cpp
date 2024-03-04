@@ -3,7 +3,7 @@
 // #include <cmath> don't know why this is here
 #include <iostream>
 #include <stack>
-#include <sys/wait.h>
+#include <sys/wait.h> //why this here
 // p = pawn
 // r = rook
 // h = horse/knight
@@ -15,6 +15,9 @@ using namespace std;
 using namespace termcolor;
 
 stack<array<int, 2> /* */> emptyStack;
+
+vector<char> takenBlack;
+vector<char> takenWhite;
 // just a empty stack to pass to nerd_display_board
 
 struct piece {
@@ -183,6 +186,15 @@ void nerd_display_board(stack<array<int, 2> /* */> possibleMoves) {
   }
   cout << " ╚════════════════════════╝\n";
   cout << "   0  1  2  3  4  5  6  7 \n";
+  cout << "Black Pieces Taken: ";
+  for (int i = 0; i < takenBlack.size(); i++) {
+    cout << takenBlack[i] << ' ';
+  }
+  cout << "\nWhite Pieces Taken: ";
+  for (int i = 0; i < takenWhite.size(); i++) {
+    cout << takenWhite[i] << ' ';
+  }
+  cout << '\n';
 }
 
 bool check_for_piece(array<int, 2> location) {
@@ -302,9 +314,14 @@ stack<array<int, 2> /* */> possible_knight_moves(int y, int x) {
       forward[0] = y + 1;
       forward[1] = x - 2;
     }
-
     iterator++;
     if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 || forward[1] < 0) {
+      if (iterator == 9) {
+        break;
+      }
+      continue;
+    }
+    if (board[forward[0]][forward[1]].white == board[y][x].white) {
       if (iterator == 9) {
         break;
       }
@@ -515,10 +532,23 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
   int targetY = target[0];
   int targetX = target[1];
   bool ifFunctionWorked = false;
+  int sizeOfPossibleMoves = possibleMoves.size();
+  // make a variable of the size of possible moves because possibleMoves.size()
+  // changes when i use .pop() so store it in variable so it don't change
 
-  for (int i = 0; i < possibleMoves.size(); i++) {
+  for (int i = 0; i < sizeOfPossibleMoves; i++) {
     if (possibleMoves.top()[0] == targetY &&
         possibleMoves.top()[1] == targetX) {
+      // check if the target is piece and if it is push it to taken pieces in
+      // it's color
+      if (check_for_piece(target)) {
+        if (board[targetY][targetX].white) {
+          takenWhite.push_back(board[targetY][targetX].type);
+        } else {
+          takenBlack.push_back(board[targetY][targetX].type);
+        }
+      }
+
       // copy over properties of piece to target
       board[targetY][targetX].type = board[positionY][positionX].type;
       board[targetY][targetX].white = board[positionY][positionX].white;
@@ -526,15 +556,10 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
       // replace piece with empty spot
       board[positionY][positionX].type = '+';
       ifFunctionWorked = true;
+      break;
     } else {
       possibleMoves.pop();
     }
-  }
-
-  if (ifFunctionWorked) {
-    cout << "WORKED\n";
-  } else {
-    cout << "DID NOT WORKED\n";
   }
 
   return ifFunctionWorked;
@@ -542,6 +567,8 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
 
 int main() {
   reset_board();
+  board[2][3].type = 'p';
+  board[2][3].white = true;
   nerd_display_board(emptyStack);
   while (true) {
     array<int, 2> in1;
