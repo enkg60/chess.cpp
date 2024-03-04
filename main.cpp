@@ -101,7 +101,7 @@ void nerd_display_board(stack<array<int, 2> /* */> possibleMoves) {
   for (int y = 0; y < 8; y++) {
     for (int x = 0; x < 8; x++) {
       if (x == 0) {
-        cout << y << "║";
+        cout << 8 - y << "║";
       }
       char type = tempBoard[y][x].type;
       string icon;
@@ -215,7 +215,7 @@ void nerd_display_board(stack<array<int, 2> /* */> possibleMoves) {
     color = !color;
   }
   cout << " ╚════════════════════════╝\n";
-  cout << "   0  1  2  3  4  5  6  7 \n";
+  cout << "   a  b  c  d  e  f  g  h \n";
   cout << "Black Pieces Taken: ";
   for (int i = 0; i < takenBlack.size(); i++) {
     cout << takenBlack[i] << ' ';
@@ -549,9 +549,9 @@ void overlay_possible_moves(array<int, 2> position) {
 array<int, 2> convert_chess_notation_to_array(string input) {
   // not finished
   array<int, 2> x;
-  x[0] = int(x[0]) - 96;
-  x[1] = input[1];
-
+  x[0] = 8 - (int(input[1]) - 48);
+  x[1] = int(input[0]) - 97;
+  cout << "position: " << x[0] << ", " << x[1] << '\n';
   return x;
 }
 
@@ -600,21 +600,18 @@ int main() {
   reset_board();
   nerd_display_board(emptyStack);
   while (true) {
-    array<int, 2> in1;
-    array<int, 2> in2;
-    cout << "piece to move:\ny: ";
-    cin >> in1[0];
-    cout << "x: ";
-    cin >> in1[1];
-    nerd_display_board(possible_moves(in1));
+    string input1;
+    string input2;
 
+    cout << "piece to move:\n";
+    cin >> input1;
+    array<int, 2> position = convert_chess_notation_to_array(input1);
+    nerd_display_board(possible_moves(position));
     cout << "position to move to:\ny: ";
-    cin >> in2[0];
-    cout << "x: ";
-    cin >> in2[1];
-    move_piece(in1, in2);
+    cin >> input2;
+    array<int, 2> target = convert_chess_notation_to_array(input2);
+    move_piece(position, target);
     nerd_display_board(emptyStack);
-    display_board();
   }
 }
 
