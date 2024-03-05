@@ -237,6 +237,14 @@ bool check_for_piece(array<int, 2> location) {
   }
 }
 
+bool piece_in_boundaries(array<int, 2> piece) {
+  if (piece[0] > 7 || piece[0] < 0 || piece[1] > 7 || piece[1] < 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 stack<array<int, 2> /* */> possible_pawn_moves(int y, int x) {
   stack<array<int, 2> /* */> possibleMoves;
   int flip = 1;
@@ -247,27 +255,35 @@ stack<array<int, 2> /* */> possible_pawn_moves(int y, int x) {
   array<int, 2> diagonalRight = {y - (1 * flip), x + (1 * flip)};
   array<int, 2> diagonalLeft = {y - (1 * flip), x - (1 * flip)};
   array<int, 2> forward = {y - (1 * flip), x};
+  array<int, 2> forwardBy2 = {y - (2 * flip), x};
 
-  if (!check_for_piece(forward)) {
+  if (!check_for_piece(forward) && piece_in_boundaries(forward)) {
     possibleMoves.push(forward);
+  }
+  if (!check_for_piece(forwardBy2) && piece_in_boundaries(forwardBy2)) {
+    possibleMoves.push(forwardBy2);
   }
   if (x == 0) { // if pawn is on right wall only check diagonal right
     if (check_for_piece(diagonalRight) &&
-        board[diagonalRight[0]][diagonalRight[1]].color != board[y][x].color) {
+        board[diagonalRight[0]][diagonalRight[1]].color != board[y][x].color &&
+        piece_in_boundaries(diagonalRight)) {
       possibleMoves.push(diagonalRight);
     }
   } else if (x == 7) { // if pawn is on left wall only check diagonal right
     if (check_for_piece(diagonalLeft) &&
-        board[diagonalLeft[0]][diagonalLeft[1]].color != board[y][x].color) {
+        board[diagonalLeft[0]][diagonalLeft[1]].color != board[y][x].color &&
+        piece_in_boundaries(diagonalLeft)) {
       possibleMoves.push(diagonalLeft);
     }
   } else { // else check both diagonal right and diagonal left
     if (check_for_piece(diagonalRight) &&
-        board[diagonalRight[0]][diagonalRight[1]].color != board[y][x].color) {
+        board[diagonalRight[0]][diagonalRight[1]].color != board[y][x].color &&
+        piece_in_boundaries(diagonalRight)) {
       possibleMoves.push(diagonalRight);
     }
     if (check_for_piece(diagonalLeft) &&
-        board[diagonalLeft[0]][diagonalLeft[1]].color != board[y][x].color) {
+        board[diagonalLeft[0]][diagonalLeft[1]].color != board[y][x].color &&
+        piece_in_boundaries(diagonalLeft)) {
       possibleMoves.push(diagonalLeft);
     }
   }
