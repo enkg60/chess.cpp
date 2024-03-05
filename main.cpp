@@ -11,8 +11,6 @@
 // q = queen
 // k = king
 
-// remove this line later
-
 using namespace std;
 
 stack<array<int, 2> /* */> emptyStack;
