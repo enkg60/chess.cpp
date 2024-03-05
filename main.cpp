@@ -11,6 +11,8 @@
 // q = queen
 // k = king
 
+// remove this line later
+
 using namespace std;
 
 stack<array<int, 2> /* */> emptyStack;
@@ -249,19 +251,23 @@ stack<array<int, 2> /* */> possible_pawn_moves(int y, int x) {
   if (!check_for_piece(forward)) {
     possibleMoves.push(forward);
   }
-  if (x == 0) {
-    if (check_for_piece(diagonalRight)) {
+  if (x == 0) { // if pawn is on right wall only check diagonal right
+    if (check_for_piece(diagonalRight) &&
+        board[diagonalRight[0]][diagonalRight[1]].color != board[y][x].color) {
       possibleMoves.push(diagonalRight);
     }
-  } else if (x == 7) {
-    if (check_for_piece(diagonalLeft)) {
+  } else if (x == 7) { // if pawn is on left wall only check diagonal right
+    if (check_for_piece(diagonalLeft) &&
+        board[diagonalLeft[0]][diagonalLeft[1]].color != board[y][x].color) {
       possibleMoves.push(diagonalLeft);
     }
-  } else {
-    if (check_for_piece(diagonalRight)) {
+  } else { // else check both diagonal right and diagonal left
+    if (check_for_piece(diagonalRight) &&
+        board[diagonalRight[0]][diagonalRight[1]].color != board[y][x].color) {
       possibleMoves.push(diagonalRight);
     }
-    if (check_for_piece(diagonalLeft)) {
+    if (check_for_piece(diagonalLeft) &&
+        board[diagonalLeft[0]][diagonalLeft[1]].color != board[y][x].color) {
       possibleMoves.push(diagonalLeft);
     }
   }
@@ -292,6 +298,9 @@ stack<array<int, 2> /* */> possible_bishop_moves(int y, int x) {
       }
       if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
           forward[1] < 0) {
+        break;
+      }
+      if (board[forward[0]][forward[1]].color == board[y][x].color) {
         break;
       }
       if (check_for_piece(forward) == false) {
@@ -404,7 +413,9 @@ stack<array<int, 2> /* */> possible_rook_moves(int y, int x) {
           forward[1] < 0) {
         break;
       }
-
+      if (board[forward[0]][forward[1]].color == board[y][x].color) {
+        break;
+      }
       if (check_for_piece(forward) == false) {
         possibleMoves.push(forward);
         iterator++;
@@ -428,6 +439,9 @@ stack<array<int, 2> /* */> possible_king_moves(int y, int x) {
       if (x1 == 0 && y1 == 0) {
         continue;
       }
+      if (board[forward[0]][forward[1]].color == board[y][x].color) {
+        continue;
+      }
       if (forward[0] > 7 || forward[0] < 0 || forward[1] > 7 ||
           forward[1] < 0) {
         continue;
@@ -440,7 +454,19 @@ stack<array<int, 2> /* */> possible_king_moves(int y, int x) {
 
 stack<array<int, 2> /* */> possible_queen_moves(int y, int x) {
   stack<array<int, 2> /* */> possibleMoves;
+  stack<array<int, 2> /**/> part1 = possible_bishop_moves(y, x);
+  stack<array<int, 2> /**/> part2 = possible_rook_moves(y, x);
+  while (!part1.empty()) {
+    possibleMoves.push(part1.top());
+    part1.pop();
+  }
+  while (!part2.empty()) {
+    possibleMoves.push(part2.top());
+    part2.pop();
+  }
+  /*
   for (int side = 0; side < 8; side++) {
+
     int iterator = 1;
     while (true) {
       array<int, 2> forward;
@@ -504,6 +530,7 @@ stack<array<int, 2> /* */> possible_queen_moves(int y, int x) {
       }
     }
   }
+  */
   return possibleMoves;
 }
 
@@ -529,7 +556,7 @@ stack<array<int, 2> /* */> possible_moves(array<int, 2> position) {
     possibleMoves = possible_king_moves(y, x);
   }
   if (type == 'q') {
-    possibleMoves = possible_king_moves(y, x);
+    possibleMoves = possible_queen_moves(y, x);
   }
   return possibleMoves;
 }
