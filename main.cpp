@@ -24,6 +24,8 @@ struct piece {
   char type;
   int color;
   int turn;
+  bool enPassent; // just to check if a pawn can be en passent
+
   // 1 = white, 2 = black and 0 = nothing
 };
 int white = 1;
@@ -40,6 +42,7 @@ piece create_piece(char type, int color, int turn) {
   piece.type = type;
   piece.color = color;
   piece.turn = turn; // if turn == 0 then there is no piece there
+  piece.enPassent = false;
   return piece;
 }
 
@@ -259,13 +262,32 @@ stack<array<int, 2> /* */> possible_pawn_moves(int y, int x) {
   array<int, 2> diagonalLeft = {y - (1 * flip), x - (1 * flip)};
   array<int, 2> forward = {y - (1 * flip), x};
   array<int, 2> forwardBy2 = {y - (2 * flip), x};
+  array<int, 2> right = {y, x + (1 * flip)};
+  array<int, 2> left = {y, x - (1 * flip)};
 
   cout << "\nTURN: " << board[y][x].turn << '\n';
 
   if (!check_for_piece(forward) && piece_in_boundaries(forward)) {
     possibleMoves.push(forward);
     if (!check_for_piece(forwardBy2) && piece_in_boundaries(forwardBy2) && board[y][x].turn == 1) {
+      board[y][x].enPassent = true;
       possibleMoves.push(forwardBy2);
+
+    }
+  }
+
+
+  //en passent rules
+  if (check_for_piece(left) ) {
+    if(board[left[0]][left[1]].turn == 2 && piece_in_boundaries(left)){
+      array<int, 2> enPassent = {y - (1 * flip), x - (1 * flip)};
+      possibleMoves.push(left);
+    }
+  }
+  if (check_for_piece(right) ) {
+    if(board[right[0]][right[1]].turn == 2 && piece_in_boundaries(right)){
+      array<int, 2> enPassent = {y - (1 * flip), x + (1 * flip)};
+      possibleMoves.push(right);
     }
   }
   
@@ -551,13 +573,30 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
   for (int i = 0; i < sizeOfPossibleMoves; i++) {
     if (possibleMoves.top()[0] == targetY &&
         possibleMoves.top()[1] == targetX) {
-      // check if the target is piece and if it is push it to taken pieces in
+      // check if the target is a piece and if it is push it to taken pieces in
       // it's color
       if (check_for_piece(target)) {
         if (board[targetY][targetX].color == white) {
           takenWhite.push_back(board[targetY][targetX].type);
         } else {
           takenBlack.push_back(board[targetY][targetX].type);
+        }
+      }
+
+      // more en passent jank
+      if(board[targetY][targetX].type == 'p' && positionY - targetY == 1 || positionY - targetY == -1){
+        board[targetY][targetX].enPassent = false;
+      }
+
+      // if statement for en passent, en passent is unoptimized will fix later
+      bool CanEnPassent;
+      int flip = 0; //flip only exsists because of this jank en passent implementation
+      if(board[targetY][targetX].enPassent && board[targetY][targetX].turn == 2 && board[positionY][positionX].type == 'p' && positionX - 1 == targetX || positionX + 1 == targetX){
+        CanEnPassent = true;
+        if(board[positionY][positionX].color == white){
+          flip = 1;
+        }else{
+          flip = -1; 
         }
       }
 
@@ -571,6 +610,21 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
       board[positionY][positionX].type = '+';
       board[positionY][positionX].color = nothing;
       board[positionY][positionX].turn = 0;
+      board[targetY][targetX].enPassent = false;
+
+      if(CanEnPassent){ // this just moves the piece forward by one, if u dont understand fully ask me
+        board[targetY - flip][targetX].type = board[targetY][targetX].type;
+        board[targetY - flip][targetX].color = board[targetY][targetX].color;
+        board[targetY - flip][targetX].turn = board[targetY][targetX].turn;
+        board[targetY - flip][targetX].enPassent = false;
+
+        board[targetY][targetX].type = '+';
+        board[targetY][targetX].color = nothing;
+        board[targetY][targetX].turn = 0;
+        board[targetY][targetX].enPassent = false;
+      }
+
+
       ifFunctionWorked = true;
       break;
     } else {
