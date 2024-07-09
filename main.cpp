@@ -5,6 +5,8 @@
 #include <stack>
 #include <vector>
 #include <sys/wait.h> //why this here
+#include <ncurses.h>
+
 // p = pawn
 // r = rook
 // h = horse/knight
