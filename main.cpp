@@ -270,23 +270,19 @@ stack<array<int, 2> /* */> possible_pawn_moves(int y, int x) {
   if (!check_for_piece(forward) && piece_in_boundaries(forward)) {
     possibleMoves.push(forward);
     if (!check_for_piece(forwardBy2) && piece_in_boundaries(forwardBy2) && board[y][x].turn == 1) {
-      board[y][x].enPassent = true;
       possibleMoves.push(forwardBy2);
-
     }
   }
 
 
   //en passent rules
-  if (check_for_piece(left) ) {
-    if(board[left[0]][left[1]].turn == 2 && piece_in_boundaries(left)){
-      array<int, 2> enPassent = {y - (1 * flip), x - (1 * flip)};
+  if (piece_in_boundaries(left) ) {
+    if(board[left[0]][left[1]].enPassent == true && check_for_piece(left)){
       possibleMoves.push(left);
     }
   }
-  if (check_for_piece(right) ) {
-    if(board[right[0]][right[1]].turn == 2 && piece_in_boundaries(right)){
-      array<int, 2> enPassent = {y - (1 * flip), x + (1 * flip)};
+  if (piece_in_boundaries(right) ) {
+    if(board[right[0]][right[1]].enPassent == true && check_for_piece(right)){
       possibleMoves.push(right);
     }
   }
@@ -560,15 +556,60 @@ array<int, 2> convert_chess_notation_to_array(string input) {
 }
 
 bool move_piece(array<int, 2> position, array<int, 2> target) {
-  stack<array<int, 2> /* */> possibleMoves = possible_moves(position);
   int positionY = position[0];
   int positionX = position[1];
   int targetY = target[0];
   int targetX = target[1];
   bool ifFunctionWorked = false;
-  int sizeOfPossibleMoves = possibleMoves.size();
   // make a variable of the size of possible moves because possibleMoves.size()
   // changes when i use .pop() so store it in variable so it don't change
+
+
+  //EN PASSENT CODE
+  if(board[positionY][positionX].color == black){
+    if(board[positionY][positionX].type == 'p' && targetY == positionY + 2 && board[positionY][positionX].turn == 1 && !check_for_piece(target)){ //if piece moving is a pawn
+      cout << "ENPASSENT ON: " << targetY << ", " << targetX << '\n';
+      // copy over properties of piece to target
+      board[targetY][targetX].type = board[positionY][positionX].type;
+      board[targetY][targetX].color = board[positionY][positionX].color;
+      board[targetY][targetX].turn = board[positionY][positionX].turn;
+      board[targetY][targetX].turn++;
+      board[targetY][targetX].enPassent = true; //this is the special line
+
+      // replace piece with empty spot
+      board[positionY][positionX].type = '+';
+      board[positionY][positionX].color = nothing;
+      board[positionY][positionX].turn = 0;
+      board[positionY][positionX].enPassent = false;
+
+      ifFunctionWorked = true;
+      return ifFunctionWorked;
+    }
+  }
+  if(board[positionY][positionX].color == white){
+    if(board[positionY][positionX].type == 'p' && targetY == positionY - 2 && board[positionY][positionX].turn == 1 && !check_for_piece(target)){ //if piece moving is a pawn
+      cout << "ENPASSENT ON: " << targetY << ", " << targetX << '\n';
+      // copy over properties of piece to target
+      board[targetY][targetX].type = board[positionY][positionX].type;
+      board[targetY][targetX].color = board[positionY][positionX].color;
+      board[targetY][targetX].turn = board[positionY][positionX].turn;
+      board[targetY][targetX].turn++;
+      board[targetY][targetX].enPassent = true; //this is the special line
+
+      // replace piece with empty spot
+      board[positionY][positionX].type = '+';
+      board[positionY][positionX].color = nothing;
+      board[positionY][positionX].turn = 0;
+      board[positionY][positionX].enPassent = false;
+
+      ifFunctionWorked = true;
+      return ifFunctionWorked;
+    }
+  }
+  //END OF EN PASSENT CODE
+
+  stack<array<int, 2> /* */> possibleMoves = possible_moves(position);
+  int sizeOfPossibleMoves = possibleMoves.size();
 
   for (int i = 0; i < sizeOfPossibleMoves; i++) {
     if (possibleMoves.top()[0] == targetY &&
@@ -583,23 +624,6 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
         }
       }
 
-      // more en passent jank
-      if(board[targetY][targetX].type == 'p' && positionY - targetY == 1 || positionY - targetY == -1){
-        board[targetY][targetX].enPassent = false;
-      }
-
-      // if statement for en passent, en passent is unoptimized will fix later
-      bool CanEnPassent;
-      int flip = 0; //flip only exsists because of this jank en passent implementation
-      if(board[targetY][targetX].enPassent && board[targetY][targetX].turn == 2 && board[positionY][positionX].type == 'p' && positionX - 1 == targetX || positionX + 1 == targetX){
-        CanEnPassent = true;
-        if(board[positionY][positionX].color == white){
-          flip = 1;
-        }else{
-          flip = -1; 
-        }
-      }
-
       // copy over properties of piece to target
       board[targetY][targetX].type = board[positionY][positionX].type;
       board[targetY][targetX].color = board[positionY][positionX].color;
@@ -611,18 +635,6 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
       board[positionY][positionX].color = nothing;
       board[positionY][positionX].turn = 0;
       board[targetY][targetX].enPassent = false;
-
-      if(CanEnPassent){ // this just moves the piece forward by one, if u dont understand fully ask me
-        board[targetY - flip][targetX].type = board[targetY][targetX].type;
-        board[targetY - flip][targetX].color = board[targetY][targetX].color;
-        board[targetY - flip][targetX].turn = board[targetY][targetX].turn;
-        board[targetY - flip][targetX].enPassent = false;
-
-        board[targetY][targetX].type = '+';
-        board[targetY][targetX].color = nothing;
-        board[targetY][targetX].turn = 0;
-        board[targetY][targetX].enPassent = false;
-      }
 
 
       ifFunctionWorked = true;
@@ -653,16 +665,3 @@ int main() {
     nerd_display_board(emptyStack);
   }
 }
-
-/*
-board = {
-  {'t', 'h', 'b', 'q', 'k', 'b', 'h', 't'},
-  {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'},
-  {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-  {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-  {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-  {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '},
-  {'p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'},
-  {'t', 'h', 'b', 'q', 'k', 'b', 'h', 't'},
-};
-*/
