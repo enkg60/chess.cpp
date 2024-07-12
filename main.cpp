@@ -555,32 +555,36 @@ array<int, 2> convert_chess_notation_to_array(string input) {
   return x;
 }
 
+void empty_target(array<int,2> target){
+  board[target[0]][target[1]].type = '+';
+  board[target[0]][target[1]].color = nothing;
+  board[target[0]][target[1]].turn = 0;
+  board[target[0]][target[1]].enPassent = false;
+}
+
+void copy_properties_of_piece_to_target(array<int,2> position, array<int,2> target){
+  board[target[0]][target[1]].type = board[position[0]][position[1]].type;
+  board[target[0]][target[1]].color = board[position[0]][position[1]].color;
+  board[target[0]][target[1]].turn = board[position[0]][position[1]].turn;
+
+}
+
 bool move_piece(array<int, 2> position, array<int, 2> target) {
   int positionY = position[0];
   int positionX = position[1];
   int targetY = target[0];
   int targetX = target[1];
   bool ifFunctionWorked = false;
-  // make a variable of the size of possible moves because possibleMoves.size()
-  // changes when i use .pop() so store it in variable so it don't change
-
 
   //EN PASSENT CODE
   if(board[positionY][positionX].color == black){
     if(board[positionY][positionX].type == 'p' && targetY == positionY + 2 && board[positionY][positionX].turn == 1 && !check_for_piece(target)){ //if piece moving is a pawn
-      cout << "ENPASSENT ON: " << targetY << ", " << targetX << '\n';
-      // copy over properties of piece to target
-      board[targetY][targetX].type = board[positionY][positionX].type;
-      board[targetY][targetX].color = board[positionY][positionX].color;
-      board[targetY][targetX].turn = board[positionY][positionX].turn;
+
+      copy_properties_of_piece_to_target(position, target);
       board[targetY][targetX].turn++;
       board[targetY][targetX].enPassent = true; //this is the special line
 
-      // replace piece with empty spot
-      board[positionY][positionX].type = '+';
-      board[positionY][positionX].color = nothing;
-      board[positionY][positionX].turn = 0;
-      board[positionY][positionX].enPassent = false;
+      empty_target(position);
 
       ifFunctionWorked = true;
       return ifFunctionWorked;
@@ -588,19 +592,12 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
   }
   if(board[positionY][positionX].color == white){
     if(board[positionY][positionX].type == 'p' && targetY == positionY - 2 && board[positionY][positionX].turn == 1 && !check_for_piece(target)){ //if piece moving is a pawn
-      cout << "ENPASSENT ON: " << targetY << ", " << targetX << '\n';
-      // copy over properties of piece to target
-      board[targetY][targetX].type = board[positionY][positionX].type;
-      board[targetY][targetX].color = board[positionY][positionX].color;
-      board[targetY][targetX].turn = board[positionY][positionX].turn;
+
+      copy_properties_of_piece_to_target(position, target);
       board[targetY][targetX].turn++;
       board[targetY][targetX].enPassent = true; //this is the special line
 
-      // replace piece with empty spot
-      board[positionY][positionX].type = '+';
-      board[positionY][positionX].color = nothing;
-      board[positionY][positionX].turn = 0;
-      board[positionY][positionX].enPassent = false;
+      empty_target(position);
 
       ifFunctionWorked = true;
       return ifFunctionWorked;
@@ -625,15 +622,10 @@ bool move_piece(array<int, 2> position, array<int, 2> target) {
       }
 
       // copy over properties of piece to target
-      board[targetY][targetX].type = board[positionY][positionX].type;
-      board[targetY][targetX].color = board[positionY][positionX].color;
-      board[targetY][targetX].turn = board[positionY][positionX].turn;
+      copy_properties_of_piece_to_target(position, target);
       board[targetY][targetX].turn++;
 
-      // replace piece with empty spot
-      board[positionY][positionX].type = '+';
-      board[positionY][positionX].color = nothing;
-      board[positionY][positionX].turn = 0;
+      empty_target(position);
       board[targetY][targetX].enPassent = false;
 
 
